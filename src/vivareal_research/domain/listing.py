@@ -1,7 +1,7 @@
 """Listing domain models and first-class collections."""
 
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Iterator, Sequence
 
 
 @dataclass(frozen=True)
@@ -9,14 +9,16 @@ class ListingPricing:
     """Pricing breakdown for a listing."""
 
     monthly_rent: int
-    monthly_condo: int = 0
-    yearly_iptu: int = 0
-    total_monthly: int = 0
+    monthly_condo: int | None = 0
+    yearly_iptu: int | None = 0
+    total_monthly: int | None = 0
 
-    def calculate_total(self) -> int:
-        """Compute estimated total monthly cost if not set."""
-        if self.total_monthly > 0:
+    def calculate_total(self) -> int | None:
+        """Compute total monthly cost only when condominium data is known."""
+        if self.total_monthly is not None and self.total_monthly > 0:
             return self.total_monthly
+        if self.monthly_condo is None:
+            return None
         return self.monthly_rent + self.monthly_condo
 
 
@@ -42,11 +44,11 @@ class ListingAddress:
 class ListingFeatures:
     """Internal property physical features bundle."""
 
-    usable_area: int
-    bedrooms: int
-    bathrooms: int
-    suites: int = 0
-    parking_spaces: int = 0
+    usable_area: int | None
+    bedrooms: int | None
+    bathrooms: int | None
+    suites: int | None = 0
+    parking_spaces: int | None = 0
 
 
 @dataclass(frozen=True)

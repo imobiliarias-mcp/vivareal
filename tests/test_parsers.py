@@ -108,6 +108,12 @@ def test_detail_parser_json_ld() -> None:
     assert len(detail.gallery()) == 2
     assert detail.gallery().first() == "https://resizedimgs.vivareal.com/img1.webp"
     assert "Excelente casa" in detail.description()
+    assert detail.summary.address.city == ""
+    assert detail.summary.address.state_acronym == ""
+    assert detail.summary.features.usable_area is None
+    assert detail.summary.features.bedrooms is None
+    assert detail.summary.pricing.total_monthly is None
+    assert detail.summary.pricing.calculate_total() is None
 
 
 def test_location_parser() -> None:

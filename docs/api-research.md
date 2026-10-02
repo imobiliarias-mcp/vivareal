@@ -160,6 +160,8 @@ The page embeds a `Schema.org` `Product` JSON-LD block:
 }
 ```
 
+The live detail HTML also serializes the full listing in the Next.js Flight stream (`self.__next_f.push(...)`) at `baseData.pageData.listing`. Its explicit `address`, `prices.rental`, `amenities`, and `advertiser` fields supply detail values omitted from Product JSON-LD. The parser leaves absent feature and fee values unknown rather than inventing a Timóteo address or treating rent alone as the monthly total.
+
 ---
 
 ## 3. Filter Conventions & Parameter Encoding
