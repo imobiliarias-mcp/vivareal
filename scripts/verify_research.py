@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 from pathlib import Path
 
@@ -5,7 +7,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.mcp.tools import (
-    vivareal_get_property_detail,
     vivareal_search_rentals,
     vivareal_suggest_locations,
 )
@@ -39,6 +40,7 @@ def verify_target_search() -> str:
     print(f"  Rent: R$ {first_item.pricing.monthly_rent} | Total: R$ {first_item.pricing.total_monthly}")
     print(f"  Bedrooms: {first_item.features.bedrooms} | Usable area: {first_item.features.usable_area} m²")
     print(f"  Location: {first_item.address.display_neighborhood()}")
+    print(f"  Public URL: {first_item.canonical_url}")
     return first_item.canonical_url
 
 

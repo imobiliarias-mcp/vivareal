@@ -40,7 +40,10 @@ for item in results:
     print(f"[{item.listing_id}] {item.title}")
     print(f"  Rent: R$ {item.pricing.monthly_rent} | Total: R$ {item.pricing.total_monthly}")
     print(f"  Rooms: {item.features.bedrooms} dorms, {item.features.bathrooms} banheiros")
+    print(f"  URL: {item.canonical_url}")
 ```
+
+Search results resolve each Glue API `link.href` against the configured public website base (`web_base`), independently of the API request base (`api_base`). Absolute, relative, and protocol-relative VivaReal property links are accepted only for the configured public host and `/imovel/{slug}/` detail paths; same-host image and search URLs are rejected. Missing or invalid links fail with listing context rather than inventing a route from the internal Glue listing ID. The resolved link remains available under the existing `url` key in MCP output and as `canonical_url` on the Python listing.
 
 ### 2.2 Location Autocomplete
 ```python

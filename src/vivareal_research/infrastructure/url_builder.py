@@ -1,6 +1,7 @@
 """URL builder for Viva Real Glue API and website navigation."""
 
 import urllib.parse
+
 from vivareal_research.domain.criteria import RentalSearchCriteria
 from vivareal_research.domain.enums import PropertyType
 
@@ -19,6 +20,10 @@ class VivaRealUrlBuilder:
         """Initialize URL builder with base hosts."""
         self._api_base = api_base.rstrip("/")
         self._web_base = web_base.rstrip("/")
+
+    def public_base_url(self) -> str:
+        """Return the configured public website origin, not the Glue API host."""
+        return self._web_base
 
     def build_search_api_url(self, criteria: RentalSearchCriteria) -> str:
         """Build Glue API /v2/listings search query URL."""

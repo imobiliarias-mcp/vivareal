@@ -1,6 +1,9 @@
 """Collaborator bundles for Viva Real rental client adhering to Object Calisthenics."""
 
-from vivareal_research.infrastructure.http_client import HttpClientProtocol, HttpxHttpClient
+from vivareal_research.infrastructure.http_client import (
+    HttpClientProtocol,
+    HttpxHttpClient,
+)
 from vivareal_research.infrastructure.url_builder import VivaRealUrlBuilder
 from vivareal_research.parsers.detail_parser import VivaRealDetailParser
 from vivareal_research.parsers.location_parser import VivaRealLocationParser
@@ -35,9 +38,10 @@ class VivaRealParserSuite:
         self,
         search_parser: VivaRealSearchParser | None = None,
         detail_parser: VivaRealDetailParser | None = None,
+        public_base_url: str | None = None,
     ) -> None:
-        """Initialize suite with search and detail parsers."""
-        self._search = search_parser or VivaRealSearchParser()
+        """Initialize suite with parsers and the configured public website base."""
+        self._search = search_parser or VivaRealSearchParser(public_base_url)
         self._detail = detail_parser or VivaRealDetailParser()
         self._location = VivaRealLocationParser()
 

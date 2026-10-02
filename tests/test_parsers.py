@@ -1,5 +1,7 @@
 """Unit tests for Viva Real response parsers."""
 
+import pytest
+
 from vivareal_research.domain.enums import LocationCategory
 from vivareal_research.parsers.detail_parser import VivaRealDetailParser
 from vivareal_research.parsers.location_parser import VivaRealLocationParser
@@ -67,6 +69,65 @@ def test_search_parser_success() -> None:
     assert item.address.latitude == -19.559862
     assert item.photos_count == 2
     assert item.advertiser_name == "Frederico Zulato"
+    assert item.canonical_url == "https://www.vivareal.com.br/imovel/casa-4-quartos-alphaville/"
+
+
+def _search_payload(property_href: str | None) -> dict:
+    """Build a minimal API result for exercising card-link normalization."""
+    link = {"href": property_href} if property_href is not None else {}
+    return {
+        "search": {
+            "totalCount": 1,
+            "result": {
+                "listings": [
+                    {
+                        "listing": {"id": "internal-608", "externalId": "REF-608"},
+                        "link": link,
+                    }
+                ]
+            },
+        }
+    }
+
+
+@pytest.mark.parametrize(
+    "property_href, expected_url",
+    [
+        (
+            "https://www.vivareal.com.br/imovel/casa-608/",
+            "https://www.vivareal.com.br/imovel/casa-608/",
+        ),
+        ("/imovel/casa-608/", "https://www.vivareal.com.br/imovel/casa-608/"),
+        ("//www.vivareal.com.br/imovel/casa-608/", "https://www.vivareal.com.br/imovel/casa-608/"),
+        ("/imovel/casa-608/?id=608", "https://www.vivareal.com.br/imovel/casa-608/?id=608"),
+    ],
+)
+def test_search_parser_normalizes_property_link(property_href: str, expected_url: str) -> None:
+    """Resolve API card href values against the public web origin."""
+    listing = VivaRealSearchParser().parse(_search_payload(property_href))[0]
+
+    assert listing.canonical_url == expected_url
+
+
+@pytest.mark.parametrize(
+    "property_href",
+    [
+        "javascript:alert(1)",
+        "https://example.org/home",
+        "https://www.vivareal.com.br/fotos.jpg",
+        "/aluguel/",
+    ],
+)
+def test_search_parser_rejects_invalid_property_links(property_href: str) -> None:
+    """Reject unsafe, non-property, or foreign links with listing identity."""
+    with pytest.raises(ValueError, match="internal-608"):
+        VivaRealSearchParser().parse(_search_payload(property_href))
+
+
+def test_search_parser_rejects_missing_property_link() -> None:
+    """Never fabricate a public path from the internal Glue API listing ID."""
+    with pytest.raises(ValueError, match="internal-608"):
+        VivaRealSearchParser().parse(_search_payload(None))
 
 
 def test_detail_parser_json_ld() -> None:

@@ -14,6 +14,7 @@ results = client.search_rentals(criteria)
 print(f"Total found: {results.total_count}")
 for item in results:
     print(f"[{item.listing_id}] {item.title} - R$ {item.pricing.monthly_rent}")
+    print(f"  URL: {item.canonical_url}")
 
 # 2. Location autocomplete
 locations = client.suggest_locations("Timóteo")

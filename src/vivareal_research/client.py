@@ -17,7 +17,9 @@ class VivaRealRentalClient:
     ) -> None:
         """Initialize client with collaborators bundle."""
         self._gateway = gateway or VivaRealGateway()
-        self._parsers = parsers or VivaRealParserSuite()
+        url_builder = self._gateway.builder()
+        public_base_url = url_builder.public_base_url()
+        self._parsers = parsers or VivaRealParserSuite(public_base_url=public_base_url)
 
     def search_rentals(self, criteria: RentalSearchCriteria) -> ListingCollection:
         """Search rental listings using strongly-typed criteria."""
@@ -47,7 +49,7 @@ class VivaRealRentalClient:
 
     def _normalize_property_url(self, url: str) -> str:
         """Ensure property URL is an absolute HTTPS URL."""
-        if url.startswith("http://") or url.startswith("https://"):
+        if url.startswith(("http://", "https://")):
             return url
         clean_path = url.lstrip("/")
         return f"https://www.vivareal.com.br/{clean_path}"
