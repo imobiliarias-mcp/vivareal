@@ -68,3 +68,33 @@ def test_mcp_adapter_property_detail():
     assert isinstance(detail_dict, dict)
     assert detail_dict["title"] == "Apto Timóteo"
     assert detail_dict["rent_price"] == 1200
+
+
+def test_unconstrained_search_does_not_force_bedroom_filter():
+    """No bedrooms argument must produce an empty RoomFilter (no API constraint)."""
+    from vivareal_research.domain.values import RoomFilter
+
+    provider = VivaRealRentalProvider(client=DummyClient())
+    adapter = VivaRealMcpAdapter(provider=provider)
+
+    filter_spec = adapter._build_filter(bedrooms=0, min_price=0.0, max_price=0.0, page=1)
+    assert filter_spec.bedrooms.is_empty()
+
+
+def test_zero_bedrooms_does_not_force_bedroom_filter():
+    """Explicit bedrooms=0 must also produce an empty RoomFilter."""
+    provider = VivaRealRentalProvider(client=DummyClient())
+    adapter = VivaRealMcpAdapter(provider=provider)
+
+    filter_spec = adapter._build_filter(bedrooms=0, min_price=0.0, max_price=0.0, page=1)
+    assert filter_spec.bedrooms.is_empty()
+
+
+def test_explicit_bedrooms_preserves_filter():
+    """bedrooms=2 must produce RoomFilter with exactly [2]."""
+    provider = VivaRealRentalProvider(client=DummyClient())
+    adapter = VivaRealMcpAdapter(provider=provider)
+
+    filter_spec = adapter._build_filter(bedrooms=2, min_price=0.0, max_price=0.0, page=1)
+    assert not filter_spec.bedrooms.is_empty()
+    assert filter_spec.bedrooms.counts == (2,)

@@ -39,7 +39,7 @@ class VivaRealMcpAdapter:
 
     def _build_filter(self, bedrooms: int, min_price: float, max_price: float, page: int) -> FilterSpecification:
         """Build filter specification from criteria."""
-        rooms = [bedrooms] if bedrooms > 0 else [2, 3, 4]
+        rooms = [bedrooms] if bedrooms and bedrooms > 0 else []
         min_p = int(min_price) if min_price > 0 else None
         max_p = int(max_price) if max_price > 0 else None
         return FilterSpecification(
