@@ -14,6 +14,7 @@ class DummyClient:
             class pricing:
                 monthly_rent = 1200
                 monthly_condo = 300
+                yearly_iptu = 600
                 total_monthly = 1500
             class features:
                 bedrooms = 2
@@ -47,6 +48,7 @@ class DummyClient:
                     class pricing:
                         monthly_rent = 1200
                         monthly_condo = 350
+                        yearly_iptu = 600
                 return DummySummary()
         return DummyDetail()
 
@@ -80,6 +82,7 @@ def test_mcp_adapter_search_rentals():
     assert "listings" in result_dict
     assert len(result_dict["listings"]) == 1
     assert result_dict["listings"][0]["condo_fee"] == 300.0
+    assert result_dict["listings"][0]["iptu"] == 50.0
 
 
 def test_mcp_adapter_property_detail():
@@ -92,6 +95,7 @@ def test_mcp_adapter_property_detail():
     assert detail_dict["title"] == "Apto Timóteo"
     assert detail_dict["rent_price"] == 1200
     assert detail_dict["condo_fee"] == 350.0
+    assert detail_dict["iptu"] == 50.0
 
 
 def test_unconstrained_search_does_not_force_bedroom_filter():

@@ -76,12 +76,15 @@ class VivaRealMcpAdapter:
     def _format_item(self, item: Any) -> dict[str, Any]:
         """Format individual listing item."""
         condo_val = float(item.pricing.monthly_condo) if item.pricing.monthly_condo else 0.0
+        yearly_iptu = getattr(item.pricing, "yearly_iptu", None)
+        monthly_iptu = round(float(yearly_iptu) / 12.0, 2) if yearly_iptu else None
         return {
             "id": item.listing_id,
             "title": item.title,
             "price": item.pricing.monthly_rent,
             "condo": item.pricing.monthly_condo,
             "condo_fee": condo_val,
+            "iptu": monthly_iptu,
             "total_monthly": item.pricing.total_monthly,
             "bedrooms": item.features.bedrooms,
             "bathrooms": item.features.bathrooms,
@@ -101,11 +104,14 @@ class VivaRealMcpAdapter:
         detail = self._provider.get_property_detail(url)
         condo = getattr(detail.summary.pricing, "monthly_condo", None)
         condo_fee = float(condo) if condo else None
+        yearly_iptu = getattr(detail.summary.pricing, "yearly_iptu", None)
+        monthly_iptu = round(float(yearly_iptu) / 12.0, 2) if yearly_iptu else None
         return {
             "title": detail.title(),
             "description": detail.description(),
             "rent_price": detail.summary.pricing.monthly_rent,
             "condo_fee": condo_fee,
+            "iptu": monthly_iptu,
             "photos_count": len(detail.gallery()),
             "photos": list(detail.gallery()),
             "url": detail.summary.canonical_url,
