@@ -8,8 +8,28 @@ class DummyClient:
     """Dummy client for testing VivaReal adapter without network calls."""
 
     def search_rentals(self, criteria):
+        class DummyListing:
+            listing_id = "1"
+            title = "Apto"
+            class pricing:
+                monthly_rent = 1200
+                monthly_condo = 300
+                total_monthly = 1500
+            class features:
+                bedrooms = 2
+                bathrooms = 1
+                parking_spaces = 1
+                usable_area = 60
+            class address:
+                neighborhood = "Centro"
+                city = "Timóteo"
+            canonical_url = "https://www.vivareal.com.br/imovel/1"
+            advertiser_name = "Imobiliaria"
+
         class DummyCollection(list):
-            total_count = 0
+            total_count = 1
+            def __init__(self):
+                super().__init__([DummyListing()])
         return DummyCollection()
 
     def get_property_detail(self, property_url):
@@ -26,6 +46,7 @@ class DummyClient:
                     canonical_url = "https://www.vivareal.com.br/imovel/123"
                     class pricing:
                         monthly_rent = 1200
+                        monthly_condo = 350
                 return DummySummary()
         return DummyDetail()
 
@@ -57,6 +78,8 @@ def test_mcp_adapter_search_rentals():
     assert isinstance(result_dict, dict)
     assert result_dict["provider"] == "vivareal"
     assert "listings" in result_dict
+    assert len(result_dict["listings"]) == 1
+    assert result_dict["listings"][0]["condo_fee"] == 300.0
 
 
 def test_mcp_adapter_property_detail():
@@ -68,6 +91,7 @@ def test_mcp_adapter_property_detail():
     assert isinstance(detail_dict, dict)
     assert detail_dict["title"] == "Apto Timóteo"
     assert detail_dict["rent_price"] == 1200
+    assert detail_dict["condo_fee"] == 350.0
 
 
 def test_unconstrained_search_does_not_force_bedroom_filter():

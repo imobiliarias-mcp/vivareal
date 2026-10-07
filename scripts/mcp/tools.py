@@ -75,11 +75,13 @@ class VivaRealMcpAdapter:
 
     def _format_item(self, item: Any) -> dict[str, Any]:
         """Format individual listing item."""
+        condo_val = float(item.pricing.monthly_condo) if item.pricing.monthly_condo else 0.0
         return {
             "id": item.listing_id,
             "title": item.title,
             "price": item.pricing.monthly_rent,
             "condo": item.pricing.monthly_condo,
+            "condo_fee": condo_val,
             "total_monthly": item.pricing.total_monthly,
             "bedrooms": item.features.bedrooms,
             "bathrooms": item.features.bathrooms,
@@ -97,10 +99,13 @@ class VivaRealMcpAdapter:
         if not property_code.startswith("http"):
             url = f"https://www.vivareal.com.br/imovel/{property_code}/"
         detail = self._provider.get_property_detail(url)
+        condo = getattr(detail.summary.pricing, "monthly_condo", None)
+        condo_fee = float(condo) if condo else None
         return {
             "title": detail.title(),
             "description": detail.description(),
             "rent_price": detail.summary.pricing.monthly_rent,
+            "condo_fee": condo_fee,
             "photos_count": len(detail.gallery()),
             "photos": list(detail.gallery()),
             "url": detail.summary.canonical_url,
